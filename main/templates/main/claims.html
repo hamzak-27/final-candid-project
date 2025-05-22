@@ -1,0 +1,162 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Claims - Candid Health{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1>Claims</h1>
+    <button class="btn btn-outline-secondary">
+        Bulk import <i class="fas fa-upload ms-1"></i>
+    </button>
+</div>
+
+<div class="mb-4">
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search by claim IDs, external ID, patient external ID, Primary member ID, patient DOB, or patient name">
+        <span class="input-group-text bg-white">
+            <i class="fas fa-search"></i>
+        </span>
+    </div>
+</div>
+
+<div class="filters">
+    <div class="filter-item">
+        <select class="form-select">
+            <option selected>Primary Payer Names</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <select class="form-select">
+            <option selected>Primary Payer IDs</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <select class="form-select">
+            <option selected>Status</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <select class="form-select">
+            <option selected>Tags</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Service Date">
+            <span class="input-group-text bg-white">
+                <i class="far fa-calendar"></i>
+            </span>
+        </div>
+    </div>
+    <div class="filter-item">
+        <select class="form-select">
+            <option selected>Owner of Next Action</option>
+        </select>
+    </div>
+</div>
+
+<div class="filters">
+    <div class="filter-item">
+        <select class="form-select">
+            <option selected>Task Categories</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <select class="form-select">
+            <option selected>Task Types</option>
+        </select>
+    </div>
+    <div class="filter-item ms-auto" style="max-width: 120px;">
+        <button class="btn btn-sm btn-primary w-100">
+            <i class="fas fa-filter me-1"></i> Add
+        </button>
+    </div>
+    <div class="filter-item" style="max-width: 120px;">
+        <button class="btn btn-sm btn-outline-secondary w-100">Reset</button>
+    </div>
+</div>
+
+<div class="pagination-controls mb-3">
+    <div>
+        <button class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary ms-2">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+    <div>
+        <button class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-list-ul me-1"></i> Activity
+        </button>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    <input type="checkbox" class="form-check-input">
+                </th>
+                <th>Patient Name</th>
+                <th>Service Date</th>
+                <th>Payer Name</th>
+                <th>Payer ID</th>
+                <th>Status</th>
+                <th>Billed</th>
+                <th>Allowed</th>
+                <th>Insurance Paid</th>
+                <th>Patient Resp.</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if claims %}
+                {% for claim in claims %}
+                <tr>
+                    <td><input type="checkbox" class="form-check-input"></td>
+                    <td><a href="{% url 'main:claim_detail' claim.id %}" class="text-decoration-none text-dark">{{ claim.patient_name }}</a></td>
+                    <td>{{ claim.service_date|date:"m/d/Y" }}</td>
+                    <td>{{ claim.payer_name }}</td>
+                    <td>{{ claim.payer_id }}</td>
+                    <td><span class="badge bg-info text-dark">{{ claim.status }}</span></td>
+                    <td>${{ claim.billed_amount }}</td>
+                    <td>${{ claim.allowed_amount }}</td>
+                    <td>${{ claim.insurance_paid }}</td>
+                    <td>${{ claim.patient_responsibility }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-link">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="11" class="text-center py-4">
+                        <p>No claims found</p>
+                        <button class="btn btn-outline-primary">
+                            <i class="fas fa-upload me-2"></i> Import Claims
+                        </button>
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="pagination-controls mt-3">
+    <div>
+        <span class="text-muted">Showing 0-0 of 0 results</span>
+    </div>
+    <div>
+        <button class="btn btn-sm btn-outline-secondary disabled">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-secondary disabled ms-2">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+{% endblock %} 

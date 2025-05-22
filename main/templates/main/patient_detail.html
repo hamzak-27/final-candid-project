@@ -1,0 +1,81 @@
+{% extends 'main/base.html' %}
+{% block title %}Patient - Candid Health{% endblock %}
+{% block content %}
+<a href="{% url 'main:patients' %}" class="btn btn-link">&larr; Back to all Patients</a>
+<div class="container bg-white rounded shadow-sm p-4 my-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+            <h1 class="mb-0">{{ claim.patient_name }}</h1>
+            <div class="text-muted mb-3">Patient {{ form.external_patient_id.initial }}</div>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Actions
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsDropdown">
+                <li><a class="dropdown-item" href="#">Download Superbill</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col">
+            <span class="text-muted">Current Balance</span><br><span class="fw-bold">$0.00</span>
+        </div>
+        <div class="col">
+            <span class="text-muted">Total Patient Payments</span><br><span class="fw-bold">$0.00</span>
+        </div>
+        <div class="col">
+            <span class="text-muted">Insurance Payments</span><br><span class="fw-bold">${{ claim.insurance_paid }}</span>
+        </div>
+        <div class="col">
+            <span class="text-muted">Patient Adjustments</span><br><span class="fw-bold">$0.00</span>
+        </div>
+        <div class="col">
+            <span class="text-muted">Balance Excluding Pending Invoices</span><br><span class="fw-bold">$0.00</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h5>Demographic</h5>
+            <div><b>First Name</b><br>{{ form.first_name.initial }}</div>
+            <div><b>Last Name</b><br>{{ form.last_name.initial }}</div>
+            <div><b>Date of Birth</b><br>{{ form.date_of_birth.initial }}</div>
+            <div><b>Gender</b><br>{{ form.gender.initial }}</div>
+            <div><b>Address</b><br>{{ form.address_1.initial }}<br>{{ form.city.initial }}, {{ form.state.initial }} {{ form.zip_code.initial }}{% if form.zip_plus_4.initial %}-{{ form.zip_plus_4.initial }}{% endif %}</div>
+        </div>
+        <div class="col-md-6">
+            <h5>Insurance</h5>
+            <div class="row">
+                <div class="col">
+                    <b>Primary</b><br>
+                    <span class="text-muted">Payer</span><br>{{ claim.payer_name }}<br>
+                    <span class="text-muted">Payer ID</span><br>{{ claim.payer_id }}<br>
+                    <span class="text-muted">Name</span><br>{{ claim.patient_name }}<br>
+                    <span class="text-muted">Date of Birth</span><br>{{ form.date_of_birth.initial }}<br>
+                    <span class="text-muted">Member ID</span><br>5KM1CX7AK06<br>
+                    <span class="text-muted">Group Number</span><br>-<br>
+                    <span class="text-muted">Plan Name</span><br>-<br>
+                    <span class="text-muted">Plan Type</span><br>MB<br>
+                    <span class="text-muted">Insurance Type</span><br>-<br>
+                    <span class="text-muted">Relationship To Subscriber</span><br>18<br>
+                    <span class="text-muted">Gender</span><br>{{ form.gender.initial }}<br>
+                </div>
+                <div class="col">
+                    <b>Secondary</b><br>
+                    <span class="text-muted">Payer</span><br>GLOBE LIFE & ACCIDENT INSURANCE COMPANY<br>
+                    <span class="text-muted">Payer ID</span><br>91472<br>
+                    <span class="text-muted">Name</span><br>{{ claim.patient_name }}<br>
+                    <span class="text-muted">Date of Birth</span><br>{{ form.date_of_birth.initial }}<br>
+                    <span class="text-muted">Member ID</span><br>634112223<br>
+                    <span class="text-muted">Group Number</span><br>-<br>
+                    <span class="text-muted">Plan Name</span><br>-<br>
+                    <span class="text-muted">Plan Type</span><br>-<br>
+                    <span class="text-muted">Insurance Type</span><br>-<br>
+                    <span class="text-muted">Relationship To Subscriber</span><br>18<br>
+                    <span class="text-muted">Gender</span><br>{{ form.gender.initial }}<br>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

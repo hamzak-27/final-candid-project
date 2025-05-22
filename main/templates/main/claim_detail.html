@@ -1,0 +1,530 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Claim - Candid Health{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-3">
+    <a href="{% url 'main:claims' %}" class="btn btn-sm btn-link text-decoration-none me-2">
+        <i class="fas fa-arrow-left"></i> Back
+    </a>
+    <div class="ms-auto d-flex align-items-center">
+        <span class="me-2">Owner</span>
+        <div class="btn-group me-3">
+            <button class="btn btn-sm btn-outline-secondary">None</button>
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+        </div>
+        <span class="btn btn-sm btn-primary me-2">{{ claim.status }}</span>
+        <button class="btn btn-sm btn-outline-secondary me-2">
+            <i class="fas fa-pencil"></i>
+        </button>
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                Actions
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#">Update status</a></li>
+                <li><a class="dropdown-item" href="#">Add note</a></li>
+                <li><a class="dropdown-item" href="#">Assign owner</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="mb-4">
+    <h1 class="mb-0">{{ claim.patient_name }}</h1>
+    <div class="d-flex mt-1 text-muted small align-items-center">
+        <div class="me-4">
+            <span>Claim ID</span>
+            <div>{{ claim.id }}</div>
+        </div>
+        <div class="me-4">
+            <span>External Patient ID</span>
+            <div>{{ form.external_patient_id.initial }}</div>
+        </div>
+        <div class="me-4">
+            <span>Patient Control Number</span>
+            <div>{{ form.patient_control_number.initial }}</div>
+        </div>
+        <div class="me-4">
+            <span>Insurance Pay</span>
+            <div><a href="#" class="btn btn-link p-0" id="insurancePayBtn">Insurance Pay</a></div>
+        </div>
+        <div>
+            <span>Billable</span>
+            <div><a href="#" class="btn btn-link p-0" id="billableBtn">Billable</a></div>
+        </div>
+    </div>
+</div>
+
+<div class="mb-4">
+    <div class="d-flex mb-2">
+        <span class="badge bg-secondary me-2">deductible-met</span>
+        <button class="btn btn-sm btn-outline-secondary px-1 py-0">
+            <i class="fas fa-plus"></i> Add Tag
+        </button>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-2">
+                <div class="d-flex">
+                    <div class="me-5">
+                        <div class="text-muted small">Date of Service</div>
+                        <div>{{ claim.service_date|date:"m/d/Y" }}</div>
+                    </div>
+                    <div class="me-5">
+                        <div class="text-muted small">Billed</div>
+                        <div>${{ claim.billed_amount }}</div>
+                    </div>
+                    <div class="me-5">
+                        <div class="text-muted small">Allowed</div>
+                        <div>${{ claim.allowed_amount }}</div>
+                    </div>
+                    <div class="me-5">
+                        <div class="text-muted small">Ins Paid</div>
+                        <div>${{ claim.insurance_paid }}</div>
+                    </div>
+                    <div class="me-5">
+                        <div class="text-muted small">Patient Resp</div>
+                        <div>${{ claim.patient_responsibility }}</div>
+                    </div>
+                    <div class="me-5">
+                        <div class="text-muted small">Patient Paid</div>
+                        <div>$0.00</div>
+                    </div>
+                    <div class="me-5">
+                        <div class="text-muted small">Patient Bal</div>
+                        <div>$0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs" id="claimTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">Activity</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tasks-tab" data-bs-toggle="tab" data-bs-target="#tasks" type="button" role="tab">Tasks <span class="badge rounded-pill text-bg-secondary">0</span></button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab">Notes</button>
+    </li>
+</ul>
+
+<div class="tab-content p-3 border border-top-0 rounded-bottom mb-4">
+    <div class="tab-pane fade show active" id="activity" role="tabpanel" aria-labelledby="activity-tab">
+        <div class="d-flex justify-content-end mb-3">
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-secondary active">All</button>
+                <button class="btn btn-sm btn-outline-secondary">Timeline</button>
+                <button class="btn btn-sm btn-outline-secondary">Notes</button>
+            </div>
+        </div>
+        
+        <div class="activity-item p-2 border-bottom">
+            <div class="d-flex justify-content-between">
+                <div class="d-flex">
+                    <i class="fas fa-diamond text-primary me-2 mt-1"></i>
+                    <div>
+                        <div>Claim status updated to <span class="badge bg-primary">Submitted to Payer</span></div>
+                        <div class="text-muted small">Yesterday at 2:34 AM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="activity-item p-2 border-bottom">
+            <div class="d-flex justify-content-between">
+                <div class="d-flex">
+                    <i class="fas fa-paper-plane text-primary me-2 mt-1"></i>
+                    <div>
+                        <div>Claim submitted to NEW YORK MEDICARE GHI, 13292.</div>
+                        <div class="text-muted small">Yesterday at 2:34 AM</div>
+                        <div class="small">Submitted through Availity</div>
+                        <div class="small">Original (Primary)</div>
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-link">Open</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-pane fade" id="tasks" role="tabpanel" aria-labelledby="tasks-tab">
+        <p class="text-center my-5">No tasks available</p>
+    </div>
+    
+    <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+        <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-sm btn-primary"><i class="fas fa-plus me-1"></i> New Note</button>
+        </div>
+        <p class="text-center my-5">No notes available</p>
+    </div>
+</div>
+
+<ul class="nav nav-tabs" id="detailTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="patient-tab" data-bs-toggle="tab" data-bs-target="#patient" type="button" role="tab">Patient</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="insurance-tab" data-bs-toggle="tab" data-bs-target="#insurance" type="button" role="tab">Insurance</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="non-insurance-tab" data-bs-toggle="tab" data-bs-target="#non-insurance" type="button" role="tab">Non-Insurance Payers</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="encounter-tab" data-bs-toggle="tab" data-bs-target="#encounter" type="button" role="tab">Encounter</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="other-claims-tab" data-bs-toggle="tab" data-bs-target="#other-claims" type="button" role="tab">Other Claims</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="documentation-tab" data-bs-toggle="tab" data-bs-target="#documentation" type="button" role="tab">Documentation</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="diagnoses-tab" data-bs-toggle="tab" data-bs-target="#diagnoses" type="button" role="tab">Diagnoses</button>
+    </li>
+</ul>
+
+<div class="tab-content p-3 border border-top-0 rounded-bottom">
+    <div class="tab-pane fade show active" id="patient" role="tabpanel" aria-labelledby="patient-tab">
+        <div class="d-flex justify-content-between mb-3">
+            <h5 class="mb-0">Patient</h5>
+            <div>
+                <a href="{% url 'main:patient_detail' form.external_patient_id.initial %}" class="btn btn-sm btn-link" id="openPatientBtn">Open Patient</a>
+                <button class="btn btn-sm btn-link" id="editPatientBtn">Edit</button>
+            </div>
+        </div>
+        
+        <div id="patientViewMode">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <div class="text-muted small">First Name</div>
+                        <div>{{ form.first_name.initial }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="text-muted small">Last Name</div>
+                        <div>{{ form.last_name.initial }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="text-muted small">Date of Birth</div>
+                        <div>{{ form.date_of_birth.initial }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="text-muted small">Gender</div>
+                        <div>{{ form.gender.initial }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <div class="text-muted small">Address 1</div>
+                        <div>{{ form.address_1.initial }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="text-muted small">Address 2</div>
+                        <div>{{ form.address_2.initial|default:"-" }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="text-muted small">City</div>
+                        <div>{{ form.city.initial }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <div class="text-muted small">State</div>
+                                <div>{{ form.state.initial }}</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <div class="text-muted small">Zip Code</div>
+                                <div>{{ form.zip_code.initial }}</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <div class="text-muted small">Zip + 4</div>
+                                <div>{{ form.zip_plus_4.initial|default:"-" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <div class="text-muted small">External Patient ID</div>
+                <div>{{ form.external_patient_id.initial }}</div>
+            </div>
+            
+            <div class="mb-3">
+                <div class="text-muted small">External Encounter ID</div>
+                <div>{{ form.external_encounter_id.initial }}</div>
+            </div>
+            
+            <div class="mb-3">
+                <div class="text-muted small">Patient Control Number</div>
+                <div>{{ form.patient_control_number.initial }}</div>
+            </div>
+        </div>
+        
+        <div id="patientEditMode" style="display: none;">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
+                            {{ form.date_of_birth }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.gender.id_for_label }}" class="form-label">Gender</label>
+                            {{ form.gender }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.address_1.id_for_label }}" class="form-label">Address 1</label>
+                            {{ form.address_1 }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.address_2.id_for_label }}" class="form-label">Address 2</label>
+                            {{ form.address_2 }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.city.id_for_label }}" class="form-label">City</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.state.id_for_label }}" class="form-label">State</label>
+                                    {{ form.state }}
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.zip_code.id_for_label }}" class="form-label">Zip Code</label>
+                                    {{ form.zip_code }}
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.zip_plus_4.id_for_label }}" class="form-label">Zip + 4</label>
+                                    {{ form.zip_plus_4 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.external_patient_id.id_for_label }}" class="form-label">External Patient ID</label>
+                    {{ form.external_patient_id }}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.external_encounter_id.id_for_label }}" class="form-label">External Encounter ID</label>
+                    {{ form.external_encounter_id }}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.patient_control_number.id_for_label }}" class="form-label">Patient Control Number</label>
+                    {{ form.patient_control_number }}
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-outline-secondary me-2" id="cancelEditBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="tab-pane fade" id="insurance" role="tabpanel" aria-labelledby="insurance-tab">
+        <div class="d-flex align-items-center mb-3">
+            <h5 class="mb-0">Insurance</h5>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Primary Insurance</h6>
+                <div class="mb-2"><span class="text-muted small">Payer</span><div>{{ claim.payer_name }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Payer ID</span><div>{{ claim.payer_id }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Plan Name</span><div>-</div></div>
+                <div class="mb-2"><span class="text-muted small">Plan Type</span><div>MB</div></div>
+                <div class="mb-2"><span class="text-muted small">Insurance Type</span><div>-</div></div>
+                <div class="mb-2"><span class="text-muted small">Name</span><div>{{ claim.patient_name }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Date of Birth</span><div>{{ form.date_of_birth.initial }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Member ID</span><div>-</div></div>
+                <div class="mb-2"><span class="text-muted small">Group Number</span><div>-</div></div>
+                <div class="mb-2"><span class="text-muted small">Relationship To Subscriber</span><div>18 - Self</div></div>
+                <div class="mb-2"><span class="text-muted small">Gender</span><div>{{ form.gender.initial }}</div></div>
+            </div>
+            <div class="col-md-6">
+                <h6>Secondary Insurance</h6>
+                <div class="mb-2"><span class="text-muted small">Payer</span><div>-</div></div>
+                <div class="mb-2"><span class="text-muted small">Payer ID</span><div>-</div></div>
+                <div class="mb-2"><span class="text-muted small">Plan Name</span><div>-</div></div>
+                <div class="mb-2"><span class="text-muted small">Plan Type</span><div>-</div></div>
+                <div class="mb-2"><span class="text-muted small">Insurance Type</span><div>-</div></div>
+                <div class="mb-2"><span class="text-muted small">Name</span><div>{{ claim.patient_name }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Date of Birth</span><div>{{ form.date_of_birth.initial }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Member ID</span><div>-</div></div>
+                <div class="mb-2"><span class="text-muted small">Group Number</span><div>-</div></div>
+                <div class="mb-2"><span class="text-muted small">Relationship To Subscriber</span><div>18 - Self</div></div>
+                <div class="mb-2"><span class="text-muted small">Gender</span><div>{{ form.gender.initial }}</div></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-pane fade" id="non-insurance" role="tabpanel" aria-labelledby="non-insurance-tab">
+        <p class="text-center my-5">No non-insurance payers available</p>
+    </div>
+    
+    <div class="tab-pane fade" id="encounter" role="tabpanel" aria-labelledby="encounter-tab">
+        <p class="text-center my-5">No encounter information available</p>
+    </div>
+    
+    <div class="tab-pane fade" id="other-claims" role="tabpanel" aria-labelledby="other-claims-tab">
+        <p class="text-center my-5">No other claims available</p>
+    </div>
+    
+    <div class="tab-pane fade" id="documentation" role="tabpanel" aria-labelledby="documentation-tab">
+        <p class="text-center my-5">No documentation available</p>
+    </div>
+    
+    <div class="tab-pane fade" id="diagnoses" role="tabpanel" aria-labelledby="diagnoses-tab">
+        <p class="text-center my-5">No diagnoses available</p>
+    </div>
+</div>
+
+<!-- Billable Modal -->
+<div class="modal fade" id="billableModal" tabindex="-1" aria-labelledby="billableModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="billableModalLabel">Update the billable status and collection for this claim</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <div class="fw-bold">This state determines whether we intend to collect for this claim.</div>
+        </div>
+        <form>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="billableOptions" id="billableOption" checked>
+            <label class="form-check-label fw-bold" for="billableOption">
+              Billable
+            </label>
+            <div class="text-muted ms-4">Marking a claim as billable will attempt to collect on this claim from the appropriate billing type (Insurance Pay, Self Pay, or both).</div>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="radio" name="billableOptions" id="notBillableOption">
+            <label class="form-check-label fw-bold" for="notBillableOption">
+              Not Billable
+            </label>
+            <div class="text-muted ms-4">Marking a claim as 'not billable' will prevent collection for this claim from any billing type (Insurance Pay, Self Pay, or both). Any open tasks will be closed.</div>
+          </div>
+          <div class="mb-3">
+            <label for="billableNote" class="form-label">Note</label>
+            <input type="text" class="form-control" id="billableNote" placeholder="Add context for this update">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Insurance Pay Modal -->
+<div class="modal fade" id="insurancePayModal" tabindex="-1" aria-labelledby="insurancePayModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="insurancePayModalLabel">Update billing type of collection for this claim</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <div class="fw-bold">The billing type is whomever will initially be billed for this claim. Changing this claim's billing type will auto-close the 2 tasks associated with it.</div>
+        </div>
+        <form>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="billingTypeOptions" id="insurancePayOption" checked>
+            <label class="form-check-label fw-bold" for="insurancePayOption">
+              Insurance Pay
+            </label>
+            <div class="text-muted ms-4">Insurance is expected to be billed with the initial balance owed on the claim.</div>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="radio" name="billingTypeOptions" id="selfPayOption">
+            <label class="form-check-label fw-bold" for="selfPayOption">
+              Self Pay
+            </label>
+            <div class="text-muted ms-4">The patient is expected to be billed with the initial balance owed on the claim.</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editPatientBtn = document.getElementById('editPatientBtn');
+        const patientViewMode = document.getElementById('patientViewMode');
+        const patientEditMode = document.getElementById('patientEditMode');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        
+        editPatientBtn.addEventListener('click', function() {
+            patientViewMode.style.display = 'none';
+            patientEditMode.style.display = 'block';
+        });
+        
+        cancelEditBtn.addEventListener('click', function() {
+            patientViewMode.style.display = 'block';
+            patientEditMode.style.display = 'none';
+        });
+        
+        // Fix Django form styling
+        document.querySelectorAll('input, select, textarea').forEach(function(element) {
+            if (!element.classList.contains('form-check-input')) {
+                element.classList.add('form-control');
+            }
+        });
+
+        document.getElementById('billableBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            var billableModal = new bootstrap.Modal(document.getElementById('billableModal'));
+            billableModal.show();
+        });
+
+        document.getElementById('insurancePayBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            var insurancePayModal = new bootstrap.Modal(document.getElementById('insurancePayModal'));
+            insurancePayModal.show();
+        });
+    });
+</script>
+{% endblock %} 
