@@ -3,6 +3,35 @@
 {% block title %}Claim - Candid Health{% endblock %}
 
 {% block content %}
+<style>
+    .claim-detail-table, .claim-detail-table th, .claim-detail-table td {
+        font-size: 0.97rem;
+    }
+    .claim-detail-table th {
+        color: #64748b;
+        font-weight: 600;
+        background: #f3f4f6;
+    }
+    .claim-detail-table td, .claim-detail-table th {
+        vertical-align: middle;
+    }
+    .form-select, .form-control {
+        font-size: 0.97rem;
+        color: #475569;
+    }
+    .filter-label {
+        font-size: 0.95rem;
+        color: #64748b;
+        margin-bottom: 2px;
+    }
+    .badge, .btn, .card-title, h2, h3, h4, h5, h6, label {
+        font-size: 0.97rem !important;
+        color: #475569 !important;
+    }
+    .table-responsive {
+        font-size: 0.97rem;
+    }
+</style>
 <div class="d-flex align-items-center mb-3">
     <a href="{% url 'main:claims' %}" class="btn btn-sm btn-link text-decoration-none me-2">
         <i class="fas fa-arrow-left"></i> Back
@@ -33,7 +62,7 @@
 </div>
 
 <div class="mb-4">
-    <h1 class="mb-0">{{ claim.patient_name }}</h1>
+    <h1 class="mb-0">{{ claim.get_patient_name }}</h1>
     <div class="d-flex mt-1 text-muted small align-items-center">
         <div class="me-4">
             <span>Claim ID</span>
@@ -41,11 +70,11 @@
         </div>
         <div class="me-4">
             <span>External Patient ID</span>
-            <div>{{ form.external_patient_id.initial }}</div>
+            <div>{{ patient.external_patient_id }}</div>
         </div>
         <div class="me-4">
             <span>Patient Control Number</span>
-            <div>{{ form.patient_control_number.initial }}</div>
+            <div>QF2G...4V1Z</div>
         </div>
         <div class="me-4">
             <span>Insurance Pay</span>
@@ -197,7 +226,7 @@
         <div class="d-flex justify-content-between mb-3">
             <h5 class="mb-0">Patient</h5>
             <div>
-                <a href="{% url 'main:patient_detail' form.external_patient_id.initial %}" class="btn btn-sm btn-link" id="openPatientBtn">Open Patient</a>
+                <a href="{% url 'main:patient_detail' patient.external_patient_id %}" class="btn btn-sm btn-link" id="openPatientBtn">Open Patient</a>
                 <button class="btn btn-sm btn-link" id="editPatientBtn">Edit</button>
             </div>
         </div>
@@ -207,149 +236,118 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <div class="text-muted small">First Name</div>
-                        <div>{{ form.first_name.initial }}</div>
+                        <div>{{ patient.first_name }}</div>
                     </div>
                     <div class="mb-3">
                         <div class="text-muted small">Last Name</div>
-                        <div>{{ form.last_name.initial }}</div>
+                        <div>{{ patient.last_name }}</div>
                     </div>
                     <div class="mb-3">
                         <div class="text-muted small">Date of Birth</div>
-                        <div>{{ form.date_of_birth.initial }}</div>
+                        <div>{{ patient.date_of_birth }}</div>
                     </div>
                     <div class="mb-3">
                         <div class="text-muted small">Gender</div>
-                        <div>{{ form.gender.initial }}</div>
+                        <div>{{ patient.gender }}</div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <div class="text-muted small">Address 1</div>
-                        <div>{{ form.address_1.initial }}</div>
+                        <div>{{ patient.address_1 }}</div>
                     </div>
                     <div class="mb-3">
                         <div class="text-muted small">Address 2</div>
-                        <div>{{ form.address_2.initial|default:"-" }}</div>
+                        <div>{{ patient.address_2|default:"-" }}</div>
                     </div>
                     <div class="mb-3">
                         <div class="text-muted small">City</div>
-                        <div>{{ form.city.initial }}</div>
+                        <div>{{ patient.city }}</div>
                     </div>
                     <div class="row">
                         <div class="col-4">
                             <div class="mb-3">
                                 <div class="text-muted small">State</div>
-                                <div>{{ form.state.initial }}</div>
+                                <div>{{ patient.state }}</div>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="mb-3">
                                 <div class="text-muted small">Zip Code</div>
-                                <div>{{ form.zip_code.initial }}</div>
+                                <div>{{ patient.zip_code }}</div>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="mb-3">
-                                <div class="text-muted small">Zip + 4</div>
-                                <div>{{ form.zip_plus_4.initial|default:"-" }}</div>
+                                <div class="text-muted small">Zip+4</div>
+                                <div>{{ patient.zip_plus_4|default:"-" }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="mb-3">
-                <div class="text-muted small">External Patient ID</div>
-                <div>{{ form.external_patient_id.initial }}</div>
-            </div>
-            
-            <div class="mb-3">
-                <div class="text-muted small">External Encounter ID</div>
-                <div>{{ form.external_encounter_id.initial }}</div>
-            </div>
-            
-            <div class="mb-3">
-                <div class="text-muted small">Patient Control Number</div>
-                <div>{{ form.patient_control_number.initial }}</div>
-            </div>
         </div>
         
         <div id="patientEditMode" style="display: none;">
-            <form method="post">
+            <form method="post" action="{% url 'main:claim_detail' claim.id %}">
                 {% csrf_token %}
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                            <label class="form-label">First Name</label>
                             {{ form.first_name }}
                         </div>
                         <div class="mb-3">
-                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                            <label class="form-label">Last Name</label>
                             {{ form.last_name }}
                         </div>
                         <div class="mb-3">
-                            <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
+                            <label class="form-label">Date of Birth</label>
                             {{ form.date_of_birth }}
                         </div>
                         <div class="mb-3">
-                            <label for="{{ form.gender.id_for_label }}" class="form-label">Gender</label>
+                            <label class="form-label">Gender</label>
                             {{ form.gender }}
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="{{ form.address_1.id_for_label }}" class="form-label">Address 1</label>
+                            <label class="form-label">Address 1</label>
                             {{ form.address_1 }}
                         </div>
                         <div class="mb-3">
-                            <label for="{{ form.address_2.id_for_label }}" class="form-label">Address 2</label>
+                            <label class="form-label">Address 2</label>
                             {{ form.address_2 }}
                         </div>
                         <div class="mb-3">
-                            <label for="{{ form.city.id_for_label }}" class="form-label">City</label>
+                            <label class="form-label">City</label>
                             {{ form.city }}
                         </div>
                         <div class="row">
                             <div class="col-4">
                                 <div class="mb-3">
-                                    <label for="{{ form.state.id_for_label }}" class="form-label">State</label>
+                                    <label class="form-label">State</label>
                                     {{ form.state }}
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="mb-3">
-                                    <label for="{{ form.zip_code.id_for_label }}" class="form-label">Zip Code</label>
+                                    <label class="form-label">Zip Code</label>
                                     {{ form.zip_code }}
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="mb-3">
-                                    <label for="{{ form.zip_plus_4.id_for_label }}" class="form-label">Zip + 4</label>
+                                    <label class="form-label">Zip+4</label>
                                     {{ form.zip_plus_4 }}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="mb-3">
-                    <label for="{{ form.external_patient_id.id_for_label }}" class="form-label">External Patient ID</label>
-                    {{ form.external_patient_id }}
-                </div>
-                
-                <div class="mb-3">
-                    <label for="{{ form.external_encounter_id.id_for_label }}" class="form-label">External Encounter ID</label>
-                    {{ form.external_encounter_id }}
-                </div>
-                
-                <div class="mb-3">
-                    <label for="{{ form.patient_control_number.id_for_label }}" class="form-label">Patient Control Number</label>
-                    {{ form.patient_control_number }}
-                </div>
-                
                 <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-outline-secondary me-2" id="cancelEditBtn">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary me-2" id="cancelEditBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -367,12 +365,12 @@
                 <div class="mb-2"><span class="text-muted small">Plan Name</span><div>-</div></div>
                 <div class="mb-2"><span class="text-muted small">Plan Type</span><div>MB</div></div>
                 <div class="mb-2"><span class="text-muted small">Insurance Type</span><div>-</div></div>
-                <div class="mb-2"><span class="text-muted small">Name</span><div>{{ claim.patient_name }}</div></div>
-                <div class="mb-2"><span class="text-muted small">Date of Birth</span><div>{{ form.date_of_birth.initial }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Name</span><div>{{ claim.get_patient_name }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Date of Birth</span><div>{{ patient.date_of_birth }}</div></div>
                 <div class="mb-2"><span class="text-muted small">Member ID</span><div>-</div></div>
                 <div class="mb-2"><span class="text-muted small">Group Number</span><div>-</div></div>
                 <div class="mb-2"><span class="text-muted small">Relationship To Subscriber</span><div>18 - Self</div></div>
-                <div class="mb-2"><span class="text-muted small">Gender</span><div>{{ form.gender.initial }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Gender</span><div>{{ patient.gender }}</div></div>
             </div>
             <div class="col-md-6">
                 <h6>Secondary Insurance</h6>
@@ -381,12 +379,12 @@
                 <div class="mb-2"><span class="text-muted small">Plan Name</span><div>-</div></div>
                 <div class="mb-2"><span class="text-muted small">Plan Type</span><div>-</div></div>
                 <div class="mb-2"><span class="text-muted small">Insurance Type</span><div>-</div></div>
-                <div class="mb-2"><span class="text-muted small">Name</span><div>{{ claim.patient_name }}</div></div>
-                <div class="mb-2"><span class="text-muted small">Date of Birth</span><div>{{ form.date_of_birth.initial }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Name</span><div>{{ claim.get_patient_name }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Date of Birth</span><div>{{ patient.date_of_birth }}</div></div>
                 <div class="mb-2"><span class="text-muted small">Member ID</span><div>-</div></div>
                 <div class="mb-2"><span class="text-muted small">Group Number</span><div>-</div></div>
                 <div class="mb-2"><span class="text-muted small">Relationship To Subscriber</span><div>18 - Self</div></div>
-                <div class="mb-2"><span class="text-muted small">Gender</span><div>{{ form.gender.initial }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Gender</span><div>{{ patient.gender }}</div></div>
             </div>
         </div>
     </div>
@@ -492,26 +490,41 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const editPatientBtn = document.getElementById('editPatientBtn');
-        const patientViewMode = document.getElementById('patientViewMode');
-        const patientEditMode = document.getElementById('patientEditMode');
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
-        
-        editPatientBtn.addEventListener('click', function() {
-            patientViewMode.style.display = 'none';
-            patientEditMode.style.display = 'block';
+        const editBtn = document.getElementById('editPatientBtn');
+        const cancelBtn = document.getElementById('cancelEditBtn');
+        const viewMode = document.getElementById('patientViewMode');
+        const editMode = document.getElementById('patientEditMode');
+        const form = document.querySelector('form');
+
+        editBtn.addEventListener('click', function() {
+            console.log('Edit button clicked');
+            viewMode.style.display = 'none';
+            editMode.style.display = 'block';
         });
-        
-        cancelEditBtn.addEventListener('click', function() {
-            patientViewMode.style.display = 'block';
-            patientEditMode.style.display = 'none';
+
+        cancelBtn.addEventListener('click', function() {
+            console.log('Cancel button clicked');
+            viewMode.style.display = 'block';
+            editMode.style.display = 'none';
         });
-        
+
+        form.addEventListener('submit', function(e) {
+            console.log('Form submitted');
+            const formData = new FormData(form);
+            console.log('Form data:', Object.fromEntries(formData));
+        });
+
         // Fix Django form styling
         document.querySelectorAll('input, select, textarea').forEach(function(element) {
             if (!element.classList.contains('form-check-input')) {
                 element.classList.add('form-control');
             }
+        });
+
+        // Add form-select class to select elements
+        document.querySelectorAll('select').forEach(function(element) {
+            element.classList.remove('form-control');
+            element.classList.add('form-select');
         });
 
         document.getElementById('billableBtn').addEventListener('click', function(e) {

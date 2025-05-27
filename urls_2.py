@@ -9,6 +9,6 @@ urlpatterns = [
     path('claims/<int:claim_id>/', views.claim_detail, name='claim_detail'),
     path('patients/<str:external_patient_id>/', views.patient_detail, name='patient_detail'),
     path('patients/', views.patients, name='patients'),
-    path('tasks/', views.tasks, name='tasks'),
+    path('tasks/', views.tasks, name = 'tasks'),
     path('tasks/<int:task_id>/', views.task_detail, name='task_detail'),
 ]

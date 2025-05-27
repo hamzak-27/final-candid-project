@@ -3,59 +3,147 @@
 {% block title %}Home - Candid Health{% endblock %}
 
 {% block content %}
-<div class="content-header">
-    <h1>Dashboard</h1>
-</div>
-
+<style>
+    body, .main-content {
+        background: #fafbfc !important;
+    }
+    .dashboard-title {
+        font-family: 'Roboto', 'Inter', Arial, sans-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #22223b;
+        margin-bottom: 2rem;
+        letter-spacing: -1px;
+    }
+    .dashboard-card {
+        border-radius: 14px;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.04);
+        background: #fff;
+        font-size: 0.92rem;
+        color: #475569;
+        border: none;
+    }
+    .dashboard-card .card-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+    .dashboard-card .card-text.display-4 {
+        font-size: 2.1rem;
+        font-weight: 700;
+        color: #22223b;
+        margin-bottom: 0.2rem;
+    }
+    .dashboard-card .text-muted {
+        font-size: 0.92rem;
+        color: #94a3b8 !important;
+    }
+    .recent-claims-table {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.04);
+        font-size: 0.92rem;
+    }
+    .recent-claims-table th {
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #64748b;
+        background: #f3f4f6;
+        letter-spacing: 0.04em;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 0.7rem 1rem;
+    }
+    .recent-claims-table td {
+        font-size: 0.92rem;
+        color: #475569;
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid #f3f4f6;
+        background: #fff;
+        vertical-align: middle;
+    }
+    .recent-claims-table tr:last-child td {
+        border-bottom: none;
+    }
+    .recent-claims-table tr:hover td {
+        background: #f8fafc;
+    }
+    .badge {
+        background: #e5e7eb;
+        color: #475569;
+        border-radius: 8px;
+        font-size: 0.92rem;
+        font-weight: 500;
+        padding: 0.2em 0.9em;
+        border: none;
+        display: inline-block;
+        min-width: 50px;
+        text-align: center;
+    }
+    .btn-primary, .btn.btn-primary {
+        background: linear-gradient(90deg, #2563eb 60%, #7c3aed 100%);
+        color: #fff;
+        border: none;
+        font-size: 0.92rem;
+        border-radius: 999px;
+        padding: 0.3rem 1.2rem;
+        font-weight: 500;
+    }
+    .btn-primary:hover, .btn.btn-primary:hover {
+        background: linear-gradient(90deg, #1d4ed8 60%, #6d28d9 100%);
+        color: #fff;
+    }
+</style>
+<div class="dashboard-title">Dashboard</div>
 <div class="row">
     <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card h-100">
+        <div class="card dashboard-card h-100">
             <div class="card-body">
-                <h5 class="card-title">Claims</h5>
-                <p class="card-text display-4">{{ total_claims }}</p>
-                <p class="text-muted">Total claims in the system</p>
+                <div class="card-title">Claims</div>
+                <div class="card-text display-4">{{ total_claims }}</div>
+                <div class="text-muted">Total claims in the system</div>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card h-100">
+        <div class="card dashboard-card h-100">
             <div class="card-body">
-                <h5 class="card-title">Submitted to Payer</h5>
-                <p class="card-text display-4">{{ submitted_claims }}</p>
-                <p class="text-muted">Claims submitted to payer</p>
+                <div class="card-title">Submitted to Payer</div>
+                <div class="card-text display-4">{{ submitted_claims }}</div>
+                <div class="text-muted">Claims submitted to payer</div>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card h-100">
+        <div class="card dashboard-card h-100">
             <div class="card-body">
-                <h5 class="card-title">Approved</h5>
-                <p class="card-text display-4">{{ approved_claims }}</p>
-                <p class="text-muted">Approved claims</p>
+                <div class="card-title">Approved</div>
+                <div class="card-text display-4">{{ approved_claims }}</div>
+                <div class="text-muted">Approved claims</div>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card h-100">
+        <div class="card dashboard-card h-100">
             <div class="card-body">
-                <h5 class="card-title">Denied</h5>
-                <p class="card-text display-4">{{ denied_claims }}</p>
-                <p class="text-muted">Denied claims</p>
+                <div class="card-title">Denied</div>
+                <div class="card-text display-4">{{ denied_claims }}</div>
+                <div class="text-muted">Denied claims</div>
             </div>
         </div>
     </div>
 </div>
-
 <div class="row mt-4">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Recent Claims</h5>
+        <div class="card recent-claims-table">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background:#f3f4f6; border-bottom:1px solid #e5e7eb;">
+                <div class="mb-0" style="font-size:1.05rem; font-weight:700; color:#64748b;">Recent Claims</div>
                 <a href="{% url 'main:claims' %}" class="btn btn-sm btn-primary">View All</a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table mb-0">
                         <thead>
                             <tr>
                                 <th>Patient Name</th>
@@ -69,10 +157,10 @@
                             {% if recent_claims %}
                                 {% for claim in recent_claims %}
                                 <tr>
-                                    <td><a href="{% url 'main:claim_detail' claim.id %}" class="text-decoration-none text-dark">{{ claim.patient_name }}</a></td>
+                                    <td><a href="{% url 'main:claim_detail' claim.id %}" class="text-decoration-none" style="color:#475569;">{{ claim.get_patient_name }}</a></td>
                                     <td>{{ claim.service_date|date:"m/d/Y" }}</td>
                                     <td>{{ claim.payer_name }}</td>
-                                    <td><span class="badge bg-info text-dark">{{ claim.status }}</span></td>
+                                    <td><span class="badge">{{ claim.status }}</span></td>
                                     <td>${{ claim.billed_amount }}</td>
                                 </tr>
                                 {% endfor %}

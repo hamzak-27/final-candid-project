@@ -1,23 +1,174 @@
 {% extends 'main/base.html' %}
+
 {% block title %}Patients - Candid Health{% endblock %}
+
 {% block content %}
-<h1>Patients</h1>
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>External Patient ID</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for patient in patients %}
-        <tr>
-            <td>{{ patient.name }}</td>
-            <td>{{ patient.external_patient_id }}</td>
-            <td><a href="{% url 'main:patient_detail' patient.external_patient_id %}" class="btn btn-sm btn-primary">Open</a></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<style>
+    body, .main-content {
+        background: #fafbfc !important;
+    }
+    .patients-title {
+        font-family: 'Roboto', 'Inter', Arial, sans-serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #22223b;
+        margin-bottom: 1.2rem;
+        letter-spacing: -1px;
+    }
+    .patients-filterbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.7rem;
+        margin-bottom: 1.2rem;
+        align-items: center;
+    }
+    .patients-filterbar .form-select, .patients-filterbar .form-control {
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        font-size: 0.85rem;
+        color: #475569;
+        padding: 0.2rem 0.8rem;
+        min-width: 120px;
+        max-width: 150px;
+        box-shadow: none;
+        height: 30px;
+    }
+    .patients-filterbar .form-control[type="search"] {
+        min-width: 200px;
+        max-width: 220px;
+    }
+    .patients-filterbar .btn {
+        border-radius: 999px;
+        font-size: 0.92rem;
+        padding: 0.3rem 1.2rem;
+        background: #f3f4f6;
+        color: #475569;
+        border: none;
+        font-weight: 500;
+        transition: background 0.2s;
+        height: 36px;
+    }
+    .patients-filterbar .btn:hover {
+        background: #e5e7eb;
+        color: #22223b;
+    }
+    .patients-table {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.04);
+        overflow: hidden;
+        font-size: 0.85rem;
+    }
+    .patients-table th {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        background: #f3f4f6;
+        letter-spacing: 0.04em;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 0.5rem 0.7rem;
+    }
+    .patients-table td {
+        font-size: 0.85rem;
+        color: #475569;
+        padding: 0.5rem 0.7rem;
+        border-bottom: 1px solid #f3f4f6;
+        background: #fff;
+        vertical-align: middle;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+    }
+    .patients-table tr:last-child td {
+        border-bottom: none;
+    }
+    .patients-table tr:hover td {
+        background: #f8fafc;
+    }
+    .patients-badge {
+        background: #e5e7eb;
+        color: #475569;
+        border-radius: 8px;
+        font-size: 0.92rem;
+        font-weight: 500;
+        padding: 0.2em 0.9em;
+        border: none;
+        display: inline-block;
+        min-width: 50px;
+        text-align: center;
+    }
+    .patients-createdby {
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    @media (max-width: 1200px) {
+        .patients-filterbar { flex-direction: column; align-items: stretch; }
+    }
+</style>
+<div class="container-fluid px-0">
+    <div class="patients-title">Patients</div>
+    <form method="get" class="patients-filterbar mb-4">
+        <input type="search" class="form-control" name="search" placeholder="Search patients...">
+        <button type="submit" class="btn">Apply</button>
+        <a href="?" class="btn">Reset</a>
+        <button class="btn btn-primary ms-auto" style="background: linear-gradient(90deg, #2563eb 60%, #7c3aed 100%); color: #fff;">+ New Patient</button>
+    </form>
+    <div class="table-responsive patients-table">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>External ID</th>
+                    <th>Date of Birth</th>
+                    <th>Gender</th>
+                    <th>Location</th>
+                    <th>Claims</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr>
+                    <td>
+                        <a href="{% url 'main:patient_detail' patient.external_patient_id %}" class="text-decoration-none" style="font-weight:600; letter-spacing:0.01em; color:#475569;">
+                            {{ patient.first_name }} {{ patient.last_name }}
+                        </a>
+                    </td>
+                    <td>{{ patient.external_patient_id }}</td>
+                    <td>{{ patient.date_of_birth }}</td>
+                    <td>{{ patient.gender }}</td>
+                    <td>{{ patient.city }}, {{ patient.state }}</td>
+                    <td>
+                        <a href="#" class="text-decoration-none">
+                            {{ patient.claim_count }} claims
+                        </a>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-link text-muted" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'main:patient_detail' patient.external_patient_id %}">View Details</a></li>
+                                <li><a class="dropdown-item" href="#">Edit</a></li>
+                                <li><a class="dropdown-item" href="#">View Claims</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <p class="mb-0">No patients found</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %} 

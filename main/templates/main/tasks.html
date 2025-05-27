@@ -1,0 +1,95 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Tasks - Candid Health{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1>Tasks</h1>
+</div>
+<div class="mb-4">
+    <form method="get">
+        <div class="d-flex flex-wrap gap-2 mb-2">
+            <div class="filter-item">
+                <select class="form-select" name="status">
+                    <option value="">Open</option>
+                    {% for value, label in task_status_choices %}
+                        <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <select class="form-select" name="category">
+                    <option value="">Categories</option>
+                    {% for value, label in task_category_choices %}
+                        <option value="{{ value }}" {% if request.GET.category == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <select class="form-select" name="task_type">
+                    <option value="">Task Type</option>
+                    {% for value, label in task_type_choices %}
+                        <option value="{{ value }}" {% if request.GET.task_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <select class="form-select" name="assigned_to">
+                    <option value="">Assigned To</option>
+                    {% for user in assigned_users %}
+                        <option value="{{ user }}" {% if request.GET.assigned_to == user %}selected{% endif %}>{{ user|default:'Unassigned' }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item">
+                <input type="date" class="form-control" name="service_date" value="{{ request.GET.service_date }}">
+            </div>
+            <div class="filter-item flex-grow-1">
+                <input type="text" class="form-control" name="search" placeholder="Search by Encounter..." value="{{ request.GET.search }}">
+            </div>
+            <div class="filter-item">
+                <button class="btn btn-outline-secondary" type="submit">Apply</button>
+            </div>
+            <div class="filter-item">
+                <a href="?" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="table-responsive mt-3">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Patient Name</th>
+                <th>Patient External ID</th>
+                <th>Payer ID</th>
+                <th>Date of Service</th>
+                <th>Last Updated</th>
+                <th>Task Type</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Created By</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td><a href="{% url 'main:task_detail' task.id %}" class="text-decoration-none">{{ task.patient_name }}</a></td>
+                <td>{{ task.patient_external_id }}</td>
+                <td>{{ task.payer_id }}</td>
+                <td>{{ task.service_date|date:'m/d/Y' }}</td>
+                <td>{{ task.last_updated|date:'m/d/Y h:iA' }}</td>
+                <td>{{ task.task_type }}</td>
+                <td>{{ task.category }}</td>
+                <td><span class="btn btn-sm btn-light">{{ task.status }}</span></td>
+                <td>{{ task.created_by }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" class="text-center py-4">No tasks found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 

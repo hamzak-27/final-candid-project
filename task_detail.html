@@ -1,0 +1,121 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ task.task_type }} Task - Candid Health{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-3">
+    <a href="{% url 'main:tasks' %}" class="btn btn-sm btn-link text-decoration-none me-2">
+        <i class="fas fa-arrow-left"></i> Back to Tasks
+    </a>
+    <div class="ms-auto d-flex align-items-center">
+        <span class="me-2">Completion Status:</span>
+        <span class="btn btn-sm 
+            {% if task.status == 'Completed' %}btn-success
+            {% elif task.status == 'In Progress' %}btn-warning text-dark
+            {% else %}btn-primary{% endif %} me-3">
+            {{ task.status }}
+        </span>
+        <button class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-pencil"></i> Update Status
+        </button>
+    </div>
+</div>
+
+<div class="mb-4">
+    <h1 class="mb-3">{{ task.task_type }} Task</h1>
+    <div class="d-flex align-items-center text-muted small">
+        <div class="me-4">
+            <span>Task Type:</span>
+            <strong class="ms-1">{{ task.task_type }}</strong>
+        </div>
+        <div class="me-4">
+            <span>Category:</span>
+            <strong class="ms-1">{{ task.category }}</strong>
+        </div>
+        <div class="me-4">
+            <span>Priority:</span>
+            <strong class="ms-1">
+                <span class="badge {% if task.priority == 'High' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                    {{ task.priority }}
+                </span>
+            </strong>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Task Details</h5>
+                <div class="mb-3">
+                    <div class="text-muted small">Created</div>
+                    <div>{{ task.created_at|date:"m/d/Y" }}</div>
+                </div>
+                <div class="mb-3">
+                    <div class="text-muted small">Due Date</div>
+                    <div>{{ task.due_date|date:"m/d/Y" }}</div>
+                </div>
+                <div class="mb-3">
+                    <div class="text-muted small">Last Updated</div>
+                    <div>{{ task.claim.updated_at|date:"m/d/Y h:i A" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Related Claim</h5>
+                <div class="mb-3">
+                    <div class="text-muted small">Patient</div>
+                    <div>{{ task.claim.patient_name }}</div>
+                </div>
+                <div class="mb-3">
+                    <div class="text-muted small">Service Date</div>
+                    <div>{{ task.claim.service_date|date:"m/d/Y" }}</div>
+                </div>
+                <div class="mb-3">
+                    <div class="text-muted small">Payer</div>
+                    <div>{{ task.claim.payer_name }} ({{ task.claim.payer_id }})</div>
+                </div>
+                <div class="mb-3">
+                    <div class="text-muted small">Claim Status</div>
+                    <div>{{ task.claim.status }}</div>
+                </div>
+                <a href="{% url 'main:claim_detail' task.claim.id %}" class="btn btn-sm btn-outline-primary">
+                    View Full Claim
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs" id="taskTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">Activity</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab">Notes</button>
+    </li>
+</ul>
+
+<div class="tab-content p-3 border border-top-0 rounded-bottom">
+    <div class="tab-pane fade show active" id="activity" role="tabpanel" aria-labelledby="activity-tab">
+        <div class="activity-item p-2 border-bottom">
+            <div class="d-flex justify-content-between">
+                <div class="d-flex">
+                    <i class="fas fa-file-invoice-dollar text-primary me-2 mt-1"></i>
+                    <div>
+                        <div>Claim {{ task.claim.status|lower }} on {{ task.claim.service_date|date:"m/d/Y" }}</div>
+                        <div class="text-muted small">{{ task.claim.service_date|date:"m/d/Y h:i A" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+        <p class="text-center my-5">No notes available</p>
+    </div>
+</div>
+{% endblock %}
