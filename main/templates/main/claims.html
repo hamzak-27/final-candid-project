@@ -3,102 +3,95 @@
 {% block title %}Claims - Candid Health{% endblock %}
 
 {% block content %}
+<style>
+    .claims-table, .claims-table th, .claims-table td {
+        font-size: 0.97rem;
+    }
+    .claims-table th {
+        color: #64748b;
+        font-weight: 600;
+        background: #f3f4f6;
+    }
+    .claims-table td, .claims-table th {
+        vertical-align: middle;
+    }
+    .form-select, .form-control {
+        font-size: 0.97rem;
+        color: #475569;
+    }
+    .filter-label {
+        font-size: 0.95rem;
+        color: #64748b;
+        margin-bottom: 2px;
+    }
+    .dropdown-status-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.97rem;
+        color: #475569;
+    }
+    .dropdown-status-option i {
+        min-width: 18px;
+        font-size: 1.1em;
+    }
+</style>
+
 <div class="content-header">
-    <h1>Claims</h1>
+    <h1 style="font-size:1.5rem;">Claims</h1>
     <button class="btn btn-outline-secondary">
         Bulk import <i class="fas fa-upload ms-1"></i>
     </button>
 </div>
-
-<div class="mb-4">
-    <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search by claim IDs, external ID, patient external ID, Primary member ID, patient DOB, or patient name">
-        <span class="input-group-text bg-white">
-            <i class="fas fa-search"></i>
-        </span>
-    </div>
-</div>
-
-<div class="filters">
-    <div class="filter-item">
-        <select class="form-select">
-            <option selected>Primary Payer Names</option>
-        </select>
-    </div>
-    <div class="filter-item">
-        <select class="form-select">
-            <option selected>Primary Payer IDs</option>
-        </select>
-    </div>
-    <div class="filter-item">
-        <select class="form-select">
-            <option selected>Status</option>
-        </select>
-    </div>
-    <div class="filter-item">
-        <select class="form-select">
-            <option selected>Tags</option>
-        </select>
-    </div>
-    <div class="filter-item">
-        <div class="input-group">
-            <input type="text" class="form-control" placeholder="Service Date">
-            <span class="input-group-text bg-white">
-                <i class="far fa-calendar"></i>
-            </span>
+<form method="get" class="mb-4">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="filter-label">Search</label>
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Search by claim IDs, external ID, patient external ID, Primary member ID, patient DOB, or patient name" value="{{ search }}">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <label class="filter-label">Primary Payer Names</label>
+            <select name="payer_name" class="form-select">
+                <option value="">All</option>
+                {% for name in payer_names %}
+                <option value="{{ name }}" {% if selected_payer_name == name %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="filter-label">Primary Payer IDs</label>
+            <select name="payer_id" class="form-select">
+                <option value="">All</option>
+                {% for pid in payer_ids %}
+                <option value="{{ pid }}" {% if selected_payer_id == pid %}selected{% endif %}>{{ pid }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="filter-label">Status</label>
+            <select name="status" class="form-select">
+                <option value="">All</option>
+                {% for status in status_options %}
+                <option value="{{ status.value }}" {% if selected_status == status.value %}selected{% endif %} data-icon="{{ status.icon }}" data-color="{{ status.color }}">
+                    {{ status.label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-outline-secondary w-100 me-2" type="submit">Apply</button>
+            <a href="?" class="btn btn-outline-secondary w-100">Reset</a>
         </div>
     </div>
-    <div class="filter-item">
-        <select class="form-select">
-            <option selected>Owner of Next Action</option>
-        </select>
-    </div>
-</div>
-
-<div class="filters">
-    <div class="filter-item">
-        <select class="form-select">
-            <option selected>Task Categories</option>
-        </select>
-    </div>
-    <div class="filter-item">
-        <select class="form-select">
-            <option selected>Task Types</option>
-        </select>
-    </div>
-    <div class="filter-item ms-auto" style="max-width: 120px;">
-        <button class="btn btn-sm btn-primary w-100">
-            <i class="fas fa-filter me-1"></i> Add
-        </button>
-    </div>
-    <div class="filter-item" style="max-width: 120px;">
-        <button class="btn btn-sm btn-outline-secondary w-100">Reset</button>
-    </div>
-</div>
-
-<div class="pagination-controls mb-3">
-    <div>
-        <button class="btn btn-sm btn-outline-secondary">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="btn btn-sm btn-outline-secondary ms-2">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-    </div>
-    <div>
-        <button class="btn btn-sm btn-outline-secondary">
-            <i class="fas fa-list-ul me-1"></i> Activity
-        </button>
-    </div>
-</div>
-
+</form>
 <div class="table-responsive">
-    <table class="table">
+    <table class="table claims-table">
         <thead>
             <tr>
-                <th>
-                    <input type="checkbox" class="form-check-input">
-                </th>
+                <th><input type="checkbox" class="form-check-input"></th>
                 <th>Patient Name</th>
                 <th>Service Date</th>
                 <th>Payer Name</th>
@@ -116,11 +109,19 @@
                 {% for claim in claims %}
                 <tr>
                     <td><input type="checkbox" class="form-check-input"></td>
-                    <td><a href="{% url 'main:claim_detail' claim.id %}" class="text-decoration-none text-dark">{{ claim.patient_name }}</a></td>
+                    <td><a href="{% url 'main:claim_detail' claim.id %}" class="text-decoration-none" style="color:#475569;">{{ claim.get_patient_name }}</a></td>
                     <td>{{ claim.service_date|date:"m/d/Y" }}</td>
                     <td>{{ claim.payer_name }}</td>
                     <td>{{ claim.payer_id }}</td>
-                    <td><span class="badge bg-info text-dark">{{ claim.status }}</span></td>
+                    <td>
+                        {% for status in status_options %}
+                            {% if claim.status == status.value %}
+                                <span class="dropdown-status-option" style="color:{{ status.color }};">
+                                    <i class="fas {{ status.icon }}"></i> {{ status.label }}
+                                </span>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
                     <td>${{ claim.billed_amount }}</td>
                     <td>${{ claim.allowed_amount }}</td>
                     <td>${{ claim.insurance_paid }}</td>
@@ -144,19 +145,5 @@
             {% endif %}
         </tbody>
     </table>
-</div>
-
-<div class="pagination-controls mt-3">
-    <div>
-        <span class="text-muted">Showing 0-0 of 0 results</span>
-    </div>
-    <div>
-        <button class="btn btn-sm btn-outline-secondary disabled">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="btn btn-sm btn-outline-secondary disabled ms-2">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-    </div>
 </div>
 {% endblock %} 

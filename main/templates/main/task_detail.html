@@ -1,0 +1,140 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Task - Candid Health{% endblock %}
+
+{% block content %}
+<style>
+    .task-header { display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 0 0.5rem 0; border-bottom: 1px solid #e5e7eb; }
+    .task-title { font-size: 1.3rem; font-weight: 700; color: #22223b; }
+    .task-meta { color: #64748b; font-size: 0.95rem; }
+    .task-status { background: #e5e7eb; color: #475569; border-radius: 8px; font-size: 0.92rem; font-weight: 500; padding: 0.2em 0.9em; border: none; display: inline-block; min-width: 50px; text-align: center; }
+    .task-section { margin: 1.2rem 0; }
+    .task-desc { font-size: 0.97rem; color: #475569; margin-bottom: 1.2rem; }
+    .task-btn { border-radius: 999px; font-size: 0.92rem; padding: 0.3rem 1.2rem; background: #6366f1; color: #fff; border: none; font-weight: 500; transition: background 0.2s; }
+    .task-btn:hover { background: #4338ca; color: #fff; }
+    .open-claim-btn { border-radius: 999px; font-size: 0.92rem; padding: 0.3rem 1.2rem; background: #f3f4f6; color: #2563eb; border: none; font-weight: 500; transition: background 0.2s; }
+    .open-claim-btn:hover { background: #e0e7ef; color: #1d4ed8; }
+    .activity-feed { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(44,62,80,0.04); padding: 1rem; font-size: 0.92rem; }
+    .activity-feed .activity-item { border-bottom: 1px solid #f3f4f6; padding: 0.5rem 0; }
+    .activity-feed .activity-item:last-child { border-bottom: none; }
+    .activity-feed .activity-time { color: #64748b; font-size: 0.85rem; }
+    .modal-confirm { font-size: 1rem; }
+</style>
+<div class="container-fluid px-0">
+    <div class="task-header">
+        <div>
+            <div class="task-title">{{ task.title }}</div>
+            <div class="task-meta">Assignee: {{ task.assigned_to|default:'Unassigned' }} &nbsp; | &nbsp; Status: <span class="task-status">{{ task.status }}</span></div>
+        </div>
+        <div>
+            <form method="post" style="display:inline;">
+                {% csrf_token %}
+                <button class="task-btn" name="close_task" type="submit">Close task</button>
+            </form>
+        </div>
+    </div>
+    <div class="task-section">
+        <div class="task-desc">{{ task.description }}</div>
+        {% if claim %}
+        <a href="{% url 'main:claim_detail' claim.id %}" class="open-claim-btn mb-3">Open Claim &rarr;</a>
+        {% endif %}
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form method="post" class="mb-3">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" name="message" class="form-control" placeholder="Write a message about this task...">
+                    <button class="btn btn-outline-primary" name="add_message" type="submit">Send</button>
+                </div>
+            </form>
+            <div class="activity-feed mb-4">
+                <div style="font-weight:600; color:#6366f1; margin-bottom:0.5rem;">Activity</div>
+                {% for log in activity %}
+                <div class="activity-item">
+                    <div>{{ log.message }}</div>
+                    <div class="activity-time">{{ log.timestamp|date:'m/d/Y h:iA' }}</div>
+                </div>
+                {% empty %}
+                <div class="activity-item">No activity yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <!-- Claim/Patient summary -->
+            {% if claim and patient %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="fw-bold" style="font-size:1.1rem;">{{ patient.full_name|upper }}</div>
+                    <div class="row mt-2">
+                        <div class="col-6"><b>Claim ID</b><br>{{ claim.id }}</div>
+                        <div class="col-6"><b>External Patient ID</b><br>{{ patient.external_patient_id }}</div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-6"><b>Patient DOB</b><br>{{ patient.date_of_birth }}</div>
+                        <div class="col-6"><b>Payer ID</b><br>{{ claim.payer_id }}</div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-6"><b>Date of Service</b><br>{{ claim.service_date }}</div>
+                        <div class="col-6"><b>Status</b><br>{{ claim.status }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% if claim %}
+    <div class="mt-4">
+        <!-- Only include the details section (tabs and tab-content) from claim_detail.html -->
+        <ul class="nav nav-tabs" id="claimTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="patient-tab" data-bs-toggle="tab" data-bs-target="#patient" type="button" role="tab">Patient</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="insurance-tab" data-bs-toggle="tab" data-bs-target="#insurance" type="button" role="tab">Insurance</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="non-insurance-tab" data-bs-toggle="tab" data-bs-target="#non-insurance" type="button" role="tab">Non-Insurance Payers</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="encounter-tab" data-bs-toggle="tab" data-bs-target="#encounter" type="button" role="tab">Encounter</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="other-claims-tab" data-bs-toggle="tab" data-bs-target="#other-claims" type="button" role="tab">Other Claims</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="documentation-tab" data-bs-toggle="tab" data-bs-target="#documentation" type="button" role="tab">Documentation</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="diagnoses-tab" data-bs-toggle="tab" data-bs-target="#diagnoses" type="button" role="tab">Diagnoses</button>
+            </li>
+        </ul>
+        <div class="tab-content p-3 border border-top-0 rounded-bottom">
+            <div class="tab-pane fade show active" id="patient" role="tabpanel" aria-labelledby="patient-tab">
+                <!-- Patient tab content copied from claim_detail.html -->
+                <!-- ... (copy the patient tab content here) ... -->
+            </div>
+            <div class="tab-pane fade" id="insurance" role="tabpanel" aria-labelledby="insurance-tab">
+                <!-- Insurance tab content copied from claim_detail.html -->
+                <!-- ... (copy the insurance tab content here) ... -->
+            </div>
+            <div class="tab-pane fade" id="non-insurance" role="tabpanel" aria-labelledby="non-insurance-tab">
+                <p class="text-center my-5">No non-insurance payers available</p>
+            </div>
+            <div class="tab-pane fade" id="encounter" role="tabpanel" aria-labelledby="encounter-tab">
+                <p class="text-center my-5">No encounter information available</p>
+            </div>
+            <div class="tab-pane fade" id="other-claims" role="tabpanel" aria-labelledby="other-claims-tab">
+                <p class="text-center my-5">No other claims available</p>
+            </div>
+            <div class="tab-pane fade" id="documentation" role="tabpanel" aria-labelledby="documentation-tab">
+                <p class="text-center my-5">No documentation available</p>
+            </div>
+            <div class="tab-pane fade" id="diagnoses" role="tabpanel" aria-labelledby="diagnoses-tab">
+                <p class="text-center my-5">No diagnoses available</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

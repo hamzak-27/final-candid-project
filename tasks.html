@@ -1,0 +1,134 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Tasks - Candid Health{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1>Tasks</h1>
+</div>
+
+<div class="mb-4">
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search by patient name, claim ID, or payer">
+        <span class="input-group-text bg-white">
+            <i class="fas fa-search"></i>
+        </span>
+    </div>
+</div>
+
+<div class="filters">
+    <div class="filter-item">
+        <select class="form-select">
+            <option selected>Completion Status</option>
+            {% for value, label in task_status_choices %}
+                <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-item">
+        <select class="form-select">
+            <option selected>Task Type</option>
+            {% for value, label in task_type_choices %}
+                <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-item">
+        <select class="form-select">
+            <option selected>Category</option>
+            {% for value, label in task_category_choices %}
+                <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-item">
+        <select class="form-select">
+            <option selected>Assigned To</option>
+            {% for user in assigned_users %}
+                <option value="{{ user }}">{{ user }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-item">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Service Date">
+            <span class="input-group-text bg-white">
+                <i class="far fa-calendar"></i>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="filters">
+    <div class="filter-item">
+        <select class="form-select">
+            <option selected>Priority</option>
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+        </select>
+    </div>
+    <div class="filter-item ms-auto" style="max-width: 120px;">
+        <button class="btn btn-sm btn-primary w-100">
+            <i class="fas fa-filter me-1"></i> Apply
+        </button>
+    </div>
+    <div class="filter-item" style="max-width: 120px;">
+        <button class="btn btn-sm btn-outline-secondary w-100">Reset</button>
+    </div>
+</div>
+
+<div class="table-responsive mt-3">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Task Type</th>
+                <th>Completion Status</th>
+                <th>Category</th>
+                <th>Service Date</th>
+                <th>Payer</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>
+                    <a href="{% url 'main:task_detail' task.id %}" class="text-decoration-none">
+                        {{ task.patient.full_name|default:task.patient_name|upper }}
+                    </a>
+                </td>
+                <td>{{ task.task_type }}</td>
+                <td>
+                    <span class="badge 
+                        {% if task.status == 'Completed' %}bg-success
+                        {% elif task.status == 'In Progress' %}bg-warning text-dark
+                        {% else %}bg-primary{% endif %}">
+                        {{ task.status }}
+                    </span>
+                </td>
+                <td>{{ task.category }}</td>
+                <td>{{ task.claim.service_date|date:"m/d/Y" }}</td>
+                <td>{{ task.claim.payer_name }}</td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-link" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'main:task_detail' task.id %}">View</a></li>
+                            <li><a class="dropdown-item" href="#">Update Status</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center py-4">No tasks found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
